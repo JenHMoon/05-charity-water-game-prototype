@@ -1,15 +1,206 @@
+.tile-well-container, .tile-tap-container {
+	width: 60px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.tile-empty {
+	width: 60px;
+	height: 40px;
+}
+.well-img {
+	width: 40px;
+	height: 40px;
+	object-fit: contain;
+	display: block;
+	margin: 0 auto;
+}
+.tap-img {
+	width: 40px;
+	height: 40px;
+	object-fit: contain;
+	display: block;
+	margin: 0 auto;
+	transform: scaleX(-1);
+}
+.pipe-img {
+	width: 80%;
+	height: 80%;
+	object-fit: contain;
+	pointer-events: none; /* 이미지는 클릭 이벤트를 막지 않음 */
+}
+/* 헤더와 힌트 버튼 한 줄 배치 */
+.header-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	gap: 32px;
+	margin-top: 18px;
+	margin-bottom: 0;
+}
+.header-row .back-btn {
+	margin-right: 24px;
+}
+.header-row h1 {
+	margin: 0;
+	font-size: 1.6em;
+}
+.hint-btn-container {
+	display: flex;
+	align-items: center;
+	margin-left: 24px;
+}
+/* 상단 바: 뒤로가기, 힌트 버튼 */
+.top-bar {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	position: absolute;
+	top: 18px;
+	left: 18px;
+	gap: 10px;
+	z-index: 10;
+}
+.back-btn, .hint-btn {
+	background: #fff;
+	border: 2px solid #FFC907;
+	color: #2E9DF7;
+	border-radius: 50%;
+	width: 38px;
+	height: 38px;
+	font-size: 1.3em;
+	font-weight: bold;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: background 0.2s, border 0.2s;
+	box-shadow: 0 1px 4px rgba(46,157,247,0.08);
+}
+.back-btn:hover, .hint-btn:hover {
+	background: #FFFBEA;
+	border-color: #2E9DF7;
+}
+/* 레벨/이동 정보 영역 스타일 */
+/* info-container: 세로 배치, moves가 level 아래 */
+.info-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+	margin: 24px auto 0 auto;
+	font-size: 1.3em;
+	font-weight: 500;
+	color: #159A48;
+}
+.level-info, .moves-info {
+	background: #e6f7ff;
+	border-radius: 8px;
+	padding: 8px 20px;
+	box-shadow: 0 1px 4px rgba(46,157,247,0.06);
+	margin: 0;
+}
+
+/* tile-col: 세로 정렬, well/tap 위치 조정 */
+.tile-col {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	min-width: 60px;
+}
+.well {
+	font-size: 1.1em;
+	font-weight: bold;
+	color: #2E9DF7;
+	margin-bottom: 2px;
+}
+.tap {
+	font-size: 1.1em;
+	font-weight: bold;
+	color: #FFC907;
+	margin-top: 2px;
+}
 /* Charity: water Brand Colors
 
 Primary Colors:
-- Yellow:     #FFC907
-- Blue:       #2E9DF7
+- Yellow:     #FFC907;
+- Blue:       #2E9DF7;
 
 Secondary Colors:
-- Light Blue: #8BD1CB
-- Green:      #4FCB53
-- Orange:     #FF902A
-- Red:        #F5402C
-- Dark Green: #159A48
-- Pink:       #F16061
-
+- Light Blue: #8BD1CB;
+- Green:      #4FCB53;
+- Orange:     #FF902A;
+- Red:        #F5402C;
+- Dark Green: #159A48;
+- Pink:       #F16061;
 */
+
+body {
+	background: #f7fafc;
+	font-family: 'Segoe UI', Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	text-align: center;
+}
+
+.game-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-top: 32px;
+}
+
+.well-row, .tap-row {
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	width: 100%;
+	margin-bottom: 8px;
+}
+.well {
+	font-size: 1.2em;
+	font-weight: bold;
+	color: #2E9DF7;
+	margin-left: 8px;
+}
+.tap-row {
+	justify-content: flex-end;
+	margin-top: 8px;
+}
+.tap {
+	font-size: 1.2em;
+	font-weight: bold;
+	color: #FFC907;
+	margin-right: 8px;
+}
+
+.grid {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+.tile-row {
+	display: flex;
+	gap: 4px;
+}
+.tile {
+	width: 60px;
+	height: 60px;
+	background: #fff;
+	border: 2px solid #8BD1CB;
+	border-radius: 10px;
+	box-shadow: 0 2px 6px rgba(46,157,247,0.07);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 2em;
+	transition: background 0.2s;
+}
+.tile:hover {
+	background: #e6f7ff;
+	cursor: pointer;
+}

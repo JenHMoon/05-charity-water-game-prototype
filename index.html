@@ -7,7 +7,64 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Welcome to the Charity Water Game Prototype</h1>
+    <!-- 상단 좌측: 뒤로가기 버튼, 헤더+힌트 한 줄 -->
+    <div class="header-row">
+        <button class="back-btn" id="backBtn" title="Go Home">&#8592;</button>
+        <h1>Welcome to the Charity Water Game Prototype</h1>
+        <div class="hint-btn-container">
+            <button class="hint-btn" id="hintBtn" title="Hint">💡</button>
+        </div>
+    </div>
+    <div class="info-container">
+        <div class="level-info">Level: <span id="level">1</span></div>
+        <div class="moves-info">Moves: <span id="moves">0</span></div>
+    </div>
+    <!-- 게임 영역 -->
+    <div class="game-container">
+        <!-- 3x4 그리드 (well/tap 이미지를 타일 위/아래에 배치) -->
+        <div class="grid">
+            <!-- well이 첫 번째 타일 위에 위치 -->
+            <div class="tile-row">
+                <div class="tile-well-container">
+                    <img src="img/well.png" alt="well" class="well-img" />
+                </div>
+                <div class="tile-empty"></div>
+                <div class="tile-empty"></div>
+            </div>
+            <!-- 1행 -->
+            <div class="tile-row">
+                <div class="tile" id="tile-0-0"></div>
+                <div class="tile" id="tile-0-1"></div>
+                <div class="tile" id="tile-0-2"></div>
+            </div>
+            <!-- 2행 -->
+            <div class="tile-row">
+                <div class="tile" id="tile-1-0"></div>
+                <div class="tile" id="tile-1-1"></div>
+                <div class="tile" id="tile-1-2"></div>
+            </div>
+            <!-- 3행 -->
+            <div class="tile-row">
+                <div class="tile" id="tile-2-0"></div>
+                <div class="tile" id="tile-2-1"></div>
+                <div class="tile" id="tile-2-2"></div>
+            </div>
+            <!-- 4행 -->
+            <div class="tile-row">
+                <div class="tile" id="tile-3-0"></div>
+                <div class="tile" id="tile-3-1"></div>
+                <div class="tile" id="tile-3-2"></div>
+            </div>
+            <!-- tap이 마지막 타일 아래에 위치 -->
+            <div class="tile-row">
+                <div class="tile-empty"></div>
+                <div class="tile-empty"></div>
+                <div class="tile-tap-container">
+                    <img src="img/tap.png" alt="tap" class="tap-img" />
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="script.js"></script>
 </body>
 </html>
