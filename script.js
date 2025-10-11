@@ -1,3 +1,30 @@
+// 팝업 오버레이 show/hide 로직
+document.addEventListener('DOMContentLoaded', function() {
+	// back-btn 클릭 시 팝업 표시
+	const backBtn = document.getElementById('backBtn');
+	const popupOverlay = document.getElementById('popupOverlay');
+	const popupButtons = document.querySelectorAll('.popup-btn');
+
+	if (backBtn && popupOverlay) {
+		backBtn.addEventListener('click', function() {
+			popupOverlay.style.display = 'flex';
+		});
+	}
+
+	// 팝업 내 Resume/Restart/Home 버튼 클릭 시 팝업 닫기 (임시 동작)
+	popupButtons.forEach(function(btn) {
+		btn.addEventListener('click', function() {
+			popupOverlay.style.display = 'none';
+		});
+	});
+
+	// 팝업 바깥 영역 클릭 시 닫기 (선택적)
+	popupOverlay && popupOverlay.addEventListener('click', function(e) {
+		if (e.target === popupOverlay) {
+			popupOverlay.style.display = 'none';
+		}
+	});
+});
 
 // 3x4 그리드(총 12개 타일)에 파이프 이미지를 무작위로 배치하고, 클릭 시 90도씩 회전하게 만듭니다.
 document.addEventListener('DOMContentLoaded', () => {

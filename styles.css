@@ -1,32 +1,124 @@
+/* 팝업 오버레이 및 모달 스타일 */
+.popup-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(34, 34, 34, 0.45);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1000;
+}
+.popup-modal {
+	background: #fff;
+	border-radius: 18px;
+	box-shadow: 0 4px 24px rgba(46,157,247,0.13);
+	padding: 36px 32px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 22px;
+	min-width: 220px;
+}
+.popup-btn {
+	width: 160px;
+	padding: 12px 0;
+	font-size: 1.1em;
+	font-weight: 600;
+	border-radius: 10px;
+	border: 2px solid #52A7C1;
+	background: #e6f7ff;
+	color: #2E3A59;
+	margin: 0 auto;
+	cursor: pointer;
+	transition: background 0.18s, border 0.18s;
+	box-shadow: 0 1px 4px rgba(46,157,247,0.08);
+}
+.popup-btn:hover {
+	background: #52A7C1;
+	color: #fff;
+	border-color: #2E9DF7;
+}
+.heading-bg {
+	background: rgba(82, 167, 193, 0.8);
+	padding: 0px 32px 18px 32px;
+	margin: 0px auto 0 auto;
+	width: 100%;
+	max-width: 800px;
+	min-width: 320px;
+	box-sizing: border-box;
+	box-shadow: 0 2px 12px rgba(46,157,247,0.10);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+.heading-bg .header-row,
+.heading-bg .info-container {
+	background: none;
+}
+.heading-bg .instruction-container {
+	background: none;
+	color: #3F3C3C;
+}
+.instruction-container {
+	margin-top: 0px;
+	font-size: 1.1em;
+	color: #3F3C3C;
+	background: none;
+	border: none;
+	padding: 0;
+	box-shadow: none;
+	font-weight: 500;
+	letter-spacing: 0.01em;
+}
+.game-bg {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background: url('img/drop.png');
+	background-repeat: repeat;
+	background-size: 100px 100px;
+	border-radius: 24px;
+	padding: 0px 56px 40px 56px;
+	margin-top: 4px;
+	width: 100%;
+	max-width: 800px;
+	min-width: 320px;
+	box-sizing: border-box;
+	margin-left: auto;
+	margin-right: auto;
+}
 .tile-well-container, .tile-tap-container {
-	width: 60px;
-	height: 40px;
+	width: 90px;
+	height: 60px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 .tile-empty {
-	width: 60px;
-	height: 40px;
+	width: 90px;
+	height: 60px;
 }
 .well-img {
-	width: 40px;
-	height: 40px;
+	width: 60px;
+	height: 60px;
 	object-fit: contain;
 	display: block;
 	margin: 0 auto;
 }
 .tap-img {
-	width: 40px;
-	height: 40px;
+	width: 60px;
+	height: 60px;
 	object-fit: contain;
 	display: block;
 	margin: 0 auto;
 	transform: scaleX(-1);
 }
 .pipe-img {
-	width: 80%;
-	height: 80%;
+	width: 90%;
+	height: 90%;
 	object-fit: contain;
 	pointer-events: none; /* 이미지는 클릭 이벤트를 막지 않음 */
 }
@@ -45,12 +137,67 @@
 }
 .header-row h1 {
 	margin: 0;
-	font-size: 1.6em;
+	font-size: 1.2em;
 }
 .hint-btn-container {
 	display: flex;
 	align-items: center;
 	margin-left: 24px;
+}
+
+/* 반응형 스타일 */
+@media (max-width: 600px) {
+	.heading-bg {
+		padding: 16px 6vw 10px 6vw;
+		margin: 16px auto 0 auto;
+		width: 98vw;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+	.header-row {
+		gap: 12px;
+	}
+	.header-row h1 {
+		font-size: 1.1em;
+		word-break: break-word;
+		max-width: 60vw;
+	}
+	.info-container {
+		font-size: 1em;
+		gap: 8px;
+	}
+	.level-info, .moves-info {
+		padding: 6px 8px;
+		min-width: 60px;
+		font-size: 0.95em;
+	}
+	.game-bg {
+		padding: 10px 2vw 10px 2vw;
+		border-radius: 12px;
+		width: 98vw;
+		min-width: 0;
+		box-sizing: border-box;
+	}
+	.tile-row {
+		gap: 2px;
+	}
+	.tile, .tile-empty, .tile-well-container, .tile-tap-container {
+		width: 38px;
+		height: 38px;
+		min-width: 0;
+	}
+	.well-img, .tap-img {
+		width: 26px;
+		height: 26px;
+	}
+	.pipe-img {
+		width: 80%;
+		height: 80%;
+	}
+	.instruction-container {
+		font-size: 0.95em;
+		margin-top: 0px;
+	}
 }
 /* 상단 바: 뒤로가기, 힌트 버튼 */
 .top-bar {
@@ -66,7 +213,7 @@
 .back-btn, .hint-btn {
 	background: #fff;
 	border: 2px solid #FFC907;
-	color: #2E9DF7;
+	color: #52A7C1;
 	border-radius: 50%;
 	width: 38px;
 	height: 38px;
@@ -93,14 +240,25 @@
 	margin: 24px auto 0 auto;
 	font-size: 1.3em;
 	font-weight: 500;
-	color: #159A48;
 }
 .level-info, .moves-info {
-	background: #e6f7ff;
 	border-radius: 8px;
 	padding: 8px 20px;
 	box-shadow: 0 1px 4px rgba(46,157,247,0.06);
 	margin: 0;
+	min-width: 90px;
+	text-align: center;
+}
+.level-info {
+	background: #77ABBB;
+	color: #fff;
+	font-weight: 600;
+}
+.moves-info {
+	background: #fff;
+	border: 2px solid #003366;
+	color: #3F3C3C;
+	font-weight: 600;
 }
 
 /* tile-col: 세로 정렬, well/tap 위치 조정 */
@@ -184,23 +342,30 @@ body {
 	gap: 4px;
 }
 .tile-row {
-	display: flex;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
 	gap: 4px;
 }
+.tile-tap-container {
+	justify-self: end;
+}
 .tile {
-	width: 60px;
-	height: 60px;
+	width: 90px;
+	height: 90px;
 	background: #fff;
-	border: 2px solid #8BD1CB;
-	border-radius: 10px;
-	box-shadow: 0 2px 6px rgba(46,157,247,0.07);
+	border: 2.5px solid #8BD1CB;
+	border-radius: 14px;
+	box-shadow: 0 3px 10px rgba(46,157,247,0.09);
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 2em;
+	font-size: 2.2em;
 	transition: background 0.2s;
 }
 .tile:hover {
 	background: #e6f7ff;
 	cursor: pointer;
+}
+.tile:active {
+	background: rgba(82, 167, 193, 0.85);
 }
