@@ -15,6 +15,28 @@
             <button class="popup-btn" id="restartBtn">Restart</button>
         </div>
     </div>
+    <!-- 힌트 메시지 오버레이 -->
+    <div class="win-overlay" id="hintOverlay" style="display:none;">
+        <div class="win-modal">
+            <div class="win-message">Hint</div>
+            <div id="hintArrows" style="display:flex; flex-direction:column; gap:8px;"></div>
+            <button class="next-btn" id="closeHintBtn">Close</button>
+        </div>
+    </div>
+    <!-- 승리 메시지 오버레이 -->
+    <div class="win-overlay" id="winOverlay" style="display:none;">
+        <div class="win-modal">
+            <div class="win-message">Congrats!</div>
+            <button class="next-btn" id="nextLevelBtn">Next Level</button>
+        </div>
+    </div>
+    <!-- 패배 메시지 오버레이 -->
+    <div class="win-overlay" id="loseOverlay" style="display:none;">
+        <div class="win-modal">
+            <div class="win-message" style="color:#e74c3c">Out of Moves</div>
+            <button class="next-btn" id="tryAgainBtn">Try Again</button>
+        </div>
+    </div>
     <div class="heading-bg">
         <div class="header-row">
             <button class="back-btn" id="backBtn" title="Go Home">&#8592;</button>

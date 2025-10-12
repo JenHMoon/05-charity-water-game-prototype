@@ -1,3 +1,52 @@
+/* 승리 메시지 오버레이 및 모달 스타일 */
+.win-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(34, 34, 34, 0.45);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2000;
+}
+.win-modal {
+	background: #fff;
+	border-radius: 18px;
+	box-shadow: 0 4px 24px rgba(46,157,247,0.13);
+	padding: 36px 32px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 22px;
+	min-width: 220px;
+}
+.win-message {
+	font-size: 2em;
+	font-weight: bold;
+	color: #52A7C1;
+	margin-bottom: 10px;
+}
+.next-btn {
+	width: 160px;
+	padding: 12px 0;
+	font-size: 1.1em;
+	font-weight: 600;
+	border-radius: 10px;
+	border: 2px solid #52A7C1;
+	background: #e6f7ff;
+	color: #2E3A59;
+	margin: 0 auto;
+	cursor: pointer;
+	transition: background 0.18s, border 0.18s;
+	box-shadow: 0 1px 4px rgba(46,157,247,0.08);
+}
+.next-btn:hover {
+	background: #52A7C1;
+	color: #fff;
+	border-color: #2E9DF7;
+}
 /* 팝업 오버레이 및 모달 스타일 */
 .popup-overlay {
 	position: fixed;
