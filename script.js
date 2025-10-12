@@ -11,12 +11,26 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 
-	// 팝업 내 Resume/Restart/Home 버튼 클릭 시 팝업 닫기 (임시 동작)
+	// 팝업 내 Resume/Home 버튼 클릭 시 동작
 	popupButtons.forEach(function(btn) {
 		btn.addEventListener('click', function() {
-			popupOverlay.style.display = 'none';
+			// Resume: 새 게임 시작 (새로고침)
+			if (btn.id === 'resumeBtn') {
+				window.location.reload();
+			} else {
+				// 나머지는 팝업만 닫기
+				popupOverlay.style.display = 'none';
+			}
 		});
 	});
+
+	// 헤더의 restartBtn(↻) 클릭 시 새로고침
+	const headerRestartBtn = document.getElementById('restartBtn');
+	if (headerRestartBtn) {
+		headerRestartBtn.addEventListener('click', function() {
+			window.location.reload();
+		});
+	}
 
 	// 팝업 바깥 영역 클릭 시 닫기 (선택적)
 	popupOverlay && popupOverlay.addEventListener('click', function(e) {
@@ -32,66 +46,30 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', () => {
 	// 4행 3열 그리드의 타일을 2차원 배열로 관리합니다.
 	// tile-0-0 ~ tile-3-2 (행, 열)
-	// 힌트 버튼 클릭 시 정답 경로에 방향 화살표 표시
+	// 힌트 버튼 클릭 시 오버레이 show/hide만
 	const hintBtn = document.getElementById('hintBtn');
 	const hintOverlay = document.getElementById('hintOverlay');
-	const hintArrows = document.getElementById('hintArrows');
 	const closeHintBtn = document.getElementById('closeHintBtn');
-
-	// 방향에 따라 화살표 문자 반환
-	function getArrow(from, to) {
-		if (!from || !to) return '';
-		const dr = to[0] - from[0];
-		const dc = to[1] - from[1];
-		if (dr === 1 && dc === 0) return '↓';
-		if (dr === -1 && dc === 0) return '↑';
-		if (dr === 0 && dc === 1) return '→';
-		if (dr === 0 && dc === -1) return '←';
-		return '';
-	}
-
-	if (hintBtn && hintOverlay && hintArrows && closeHintBtn) {
+	if (hintBtn && hintOverlay && closeHintBtn) {
 		hintBtn.addEventListener('click', function() {
-			// 힌트 오버레이 표시
 			hintOverlay.style.display = 'flex';
-			// 정답 경로에 따라 화살표 표시
-			hintArrows.innerHTML = '';
-			for (let i = 0; i < path.length - 1; i++) {
-				const from = path[i];
-				const to = path[i+1];
-				const arrow = getArrow(from, to);
-				// 타일 위치와 방향 표시
-				const div = document.createElement('div');
-				div.style.fontSize = '2em';
-				div.style.display = 'flex';
-				div.style.alignItems = 'center';
-				div.style.justifyContent = 'center';
-				div.textContent = `(${from[0]},${from[1]}) ${arrow}`;
-				hintArrows.appendChild(div);
-			}
-			// 마지막 타일
-			const last = path[path.length-1];
-			const div = document.createElement('div');
-			div.style.fontSize = '2em';
-			div.style.display = 'flex';
-			div.style.alignItems = 'center';
-			div.style.justifyContent = 'center';
-			div.textContent = `(${last[0]},${last[1]})`;
-			hintArrows.appendChild(div);
 		});
 		closeHintBtn.addEventListener('click', function() {
 			hintOverlay.style.display = 'none';
 		});
 	}
-  const ROWS = 4;
-  const COLS = 3;
-  const tiles = [];
-  for (let r = 0; r < ROWS; r++) {
-    const row = [];
-    for (let c = 0; c < COLS; c++) {
-      row.push(document.getElementById(`tile-${r}-${c}`));
-    }
-    tiles.push(row);
+	const ROWS = 4;
+	const COLS = 3;
+	const tiles = [];
+	let missingTiles = [];
+	for (let r = 0; r < ROWS; r++) {
+		const row = [];
+		for (let c = 0; c < COLS; c++) {
+			const tile = document.getElementById(`tile-${r}-${c}`);
+			row.push(tile);
+			if (!tile) missingTiles.push(`tile-${r}-${c}`);
+		}
+		tiles.push(row);
   }
 
 		// 1. 정답 경로를 무작위로 생성 (우물: 0,0 → 수도꼭지: 3,2)

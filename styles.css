@@ -181,8 +181,14 @@
 	margin-top: 18px;
 	margin-bottom: 0;
 }
-.header-row .back-btn {
-	margin-right: 24px;
+.header-row .restart-btn {
+  margin-right: 24px;
+}
+.btn-group {
+  display: flex;
+  flex-direction: row;
+  align-items: left;
+  gap: 4px;
 }
 .header-row h1 {
 	margin: 0;
@@ -259,7 +265,8 @@
 	gap: 10px;
 	z-index: 10;
 }
-.back-btn, .hint-btn {
+/* back, restart, hint 버튼 모두 같은 폰트로 통일 */
+.back-btn, .restart-btn, .hint-btn {
 	background: #fff;
 	border: 2px solid #FFC907;
 	color: #52A7C1;
@@ -268,6 +275,7 @@
 	height: 38px;
 	font-size: 1.3em;
 	font-weight: bold;
+	font-family: sans-serif;
 	display: flex;
 	align-items: center;
 	justify-content: center;

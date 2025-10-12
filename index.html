@@ -12,14 +12,12 @@
         <div class="popup-modal">
             <button class="popup-btn" id="homeBtn">Home</button>
             <button class="popup-btn" id="resumeBtn">Resume</button>
-            <button class="popup-btn" id="restartBtn">Restart</button>
         </div>
     </div>
     <!-- 힌트 메시지 오버레이 -->
     <div class="win-overlay" id="hintOverlay" style="display:none;">
         <div class="win-modal">
             <div class="win-message">Hint</div>
-            <div id="hintArrows" style="display:flex; flex-direction:column; gap:8px;"></div>
             <button class="next-btn" id="closeHintBtn">Close</button>
         </div>
     </div>
@@ -39,7 +37,10 @@
     </div>
     <div class="heading-bg">
         <div class="header-row">
-            <button class="back-btn" id="backBtn" title="Go Home">&#8592;</button>
+            <div class="btn-group">
+                <button class="back-btn" id="backBtn" title="Go Home">&#8592;</button>
+                <button class="restart-btn back-btn" id="restartBtn" title="Restart">&#8635;</button>
+            </div>
             <h1>Welcome to the Charity Water Game Prototype</h1>
             <div class="hint-btn-container">
                 <button class="hint-btn" id="hintBtn" title="Hint">💡</button>
