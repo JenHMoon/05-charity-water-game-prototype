@@ -40,263 +40,231 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 });
 
+//New Logic
+const GRID_ROWS = 4;
+const GRID_COLS = 3;
+const MAX_MOVES = 10;
 
+let currentLevel = 1;
+let gridState = [];
+let currentMoves = 0;
+let gameStopped = false;
 
-// 항상 풀 수 있는 파이프라인 퍼즐을 만드는 코드
+/// Answer for Level 1
+const LEVEL1_SOLUTION = [
+    { r: 0, c: 0, type: 'pipe', isHorizontal: false },
+    { r: 1, c: 0, type: 'bend-pipe', bendState: 2 },
+    { r: 1, c: 1, type: 'pipe', isHorizontal: true },
+    { r: 1, c: 2, type: 'bend-pipe', bendState: 4 },
+    { r: 2, c: 2, type: 'pipe', isHorizontal: false },
+    { r: 3, c: 2, type: 'pipe', isHorizontal: false }
+];
+
+/// Answer for Level 2
+const LEVEL2_SOLUTION = [
+    { r: 0, c: 0, type: 'bend-pipe', bendState: 2 },
+    { r: 0, c: 1, type: 'pipe', isHorizontal: true },
+    { r: 0, c: 2, type: 'bend-pipe', bendState: 4},
+    { r: 1, c: 2, type: 'pipe', isHorizontal: false },
+    { r: 2, c: 2, type: 'pipe', isHorizontal: false },
+    { r: 3, c: 2, type: 'pipe', isHorizontal: false }
+];
+
+// =============================================================
+// RANDOM INITIALIZATION (shared for all levels)
+// =============================================================
+function applyRandomRotationToSolutionTile(solTile) {
+    if (solTile.type === 'pipe') {
+        const offset = Math.floor(Math.random() * 2); // 0 or 1
+        return {
+            type: 'pipe',
+            isHorizontal: offset === 0 ? solTile.isHorizontal : !solTile.isHorizontal
+        };
+    } else {
+        const offset = Math.floor(Math.random() * 4); // 0..3
+        const initialState = ((solTile.bendState - 1 + offset) % 4) + 1;
+        return { type: 'bend-pipe', bendState: initialState };
+    }
+}
+
+// --- Generate grid for a given level ---
+function generateInitialGridForLevel(level) {
+    const solMap = {};
+    const solution = level === 1 ? LEVEL1_SOLUTION : LEVEL2_SOLUTION;
+    solution.forEach(t => solMap[`${t.r},${t.c}`] = t);
+
+    return Array.from({ length: GRID_ROWS }, (_, r) =>
+        Array.from({ length: GRID_COLS }, (_, c) => {
+            const key = `${r},${c}`;
+            if (solMap[key]) {
+                return applyRandomRotationToSolutionTile(solMap[key]);
+            } else {
+                if (Math.random() < 0.5)
+                    return { type: 'pipe', isHorizontal: Math.random() < 0.5 };
+                else
+                    return { type: 'bend-pipe', bendState: Math.floor(Math.random() * 4) + 1 };
+            }
+        })
+    );
+}
+
+// =============================================================
+// GRID RENDERING + UI UPDATES
+// It loops through every cell (r, c)
+// of the gridState (the logical state of the board)
+// For UI update
+// Simply updates the DOM text for the “Moves” counter
+// and “Level” indicator
+// =============================================================
+function renderGrid() {
+    for (let r = 0; r < GRID_ROWS; r++) {
+        for (let c = 0; c < GRID_COLS; c++) {
+            const tileEl = document.getElementById(`tile-${r}-${c}`);
+            if (!tileEl) continue;
+
+            const tile = gridState[r][c];
+            tileEl.innerHTML = '';
+
+            const img = document.createElement('img');
+            img.src = tile.type === 'pipe' ? 'img/pipe.png' : 'img/bend-pipe.png';
+            img.className = 'pipe-img';
+            tileEl.appendChild(img);
+
+            let rotation = 0;
+            if (tile.type === 'pipe') rotation = tile.isHorizontal ? 0 : 90;
+            else rotation = (tile.bendState - 1) * 90;
+
+            tileEl.style.transform = `rotate(${rotation}deg)`;
+            tileEl.dataset.type = tile.type;
+        }
+    }
+}
+
+function updateUI() {
+    document.getElementById('moves').textContent = currentMoves;
+    document.getElementById('level').textContent = currentLevel;
+}
+
+// =============================================================
+// GAME LOGIC
+// I changed here a lot, since this way is the easiest for creating!
+// =============================================================
+function rotateTile(r, c) {
+    const tile = gridState[r][c];
+    if (tile.type === 'pipe') tile.isHorizontal = !tile.isHorizontal;
+    else tile.bendState = tile.bendState % 4 + 1;
+}
+
+function isLevel1Cleared() {
+    const t = gridState;
+    return (
+        t[0][0]?.type === 'pipe' && !t[0][0].isHorizontal &&
+        t[1][0]?.type === 'bend-pipe' && t[1][0].bendState === 2 &&
+        t[1][1]?.type === 'pipe' && t[1][1].isHorizontal &&
+        t[1][2]?.type === 'bend-pipe' && t[1][2].bendState === 4 &&
+        t[2][2]?.type === 'pipe' && !t[2][2].isHorizontal &&
+        t[3][2]?.type === 'pipe' && !t[3][2].isHorizontal
+    );
+}
+
+function isLevel2Cleared() {
+    const t = gridState;
+    return (
+        t[0][0]?.type === 'bend-pipe' && t[0][0].bendState === 2 &&
+        t[0][1]?.type === 'pipe' && t[0][1].isHorizontal &&
+        t[0][2]?.type === 'bend-pipe' && t[0][2].bendState === 4 &&
+        t[1][2]?.type === 'pipe' && !t[1][2].isHorizontal &&
+        t[2][2]?.type === 'pipe' && !t[2][2].isHorizontal &&
+        t[3][2]?.type === 'pipe' && !t[3][2].isHorizontal
+    );
+}
+
+function handleTileClick(r, c) {
+    if (gameStopped) return;
+
+    if (currentMoves >= MAX_MOVES) {
+        showLoseOverlay();
+        return;
+    }
+
+    rotateTile(r, c);
+    currentMoves++;
+    updateUI();
+    renderGrid();
+
+    if (currentLevel === 1 && isLevel1Cleared()) {
+        showWinOverlay();
+        return;
+    }
+    if (currentLevel === 2 && isLevel2Cleared()) {
+        showWinOverlay();
+        return;
+    }
+
+    if (currentMoves >= MAX_MOVES && !isCurrentLevelCleared()) {
+        showLoseOverlay();
+    }
+}
+function isCurrentLevelCleared() {
+    if (currentLevel === 1) return isLevel1Cleared();
+    if (currentLevel === 2) return isLevel2Cleared();
+    return false;
+}
+// =============================================================
+// Here is notification overlays
+// =============================================================
+function showWinOverlay() {
+    document.getElementById('winOverlay').style.display = 'flex';
+}
+function showLoseOverlay() {
+    document.getElementById('loseOverlay').style.display = 'flex';
+}
+
+// =============================================================
+// INITIALIZATION + LEVEL SWITCHING
+// Initializing logic helper method
+// Helper method is basically function that I need to call many times
+// in the other parts of code
+// =============================================================
+function initializeLevel(level) {
+    currentLevel = level;
+    currentMoves = 0;
+    gameStopped = false;
+    gridState = generateInitialGridForLevel(level);
+    updateUI();
+    renderGrid();
+    document.getElementById('gridContainer').style.display = 'grid';
+    document.getElementById('gameEndScreen').style.display = 'none';
+}
+
+// =============================================================
+// EVENT LISTENERS
+// In order User to know what is goind on
+// =============================================================
 document.addEventListener('DOMContentLoaded', () => {
-	// 4행 3열 그리드의 타일을 2차원 배열로 관리합니다.
-	// tile-0-0 ~ tile-3-2 (행, 열)
-	// 힌트 버튼 클릭 시 오버레이 show/hide만
-	const hintBtn = document.getElementById('hintBtn');
-	const hintOverlay = document.getElementById('hintOverlay');
-	const closeHintBtn = document.getElementById('closeHintBtn');
-	if (hintBtn && hintOverlay && closeHintBtn) {
-		hintBtn.addEventListener('click', function() {
-			hintOverlay.style.display = 'flex';
-		});
-		closeHintBtn.addEventListener('click', function() {
-			hintOverlay.style.display = 'none';
-		});
-	}
-	const ROWS = 4;
-	const COLS = 3;
-	const tiles = [];
-	let missingTiles = [];
-	for (let r = 0; r < ROWS; r++) {
-		const row = [];
-		for (let c = 0; c < COLS; c++) {
-			const tile = document.getElementById(`tile-${r}-${c}`);
-			row.push(tile);
-			if (!tile) missingTiles.push(`tile-${r}-${c}`);
-		}
-		tiles.push(row);
-  }
+    for (let r = 0; r < GRID_ROWS; r++) {
+        for (let c = 0; c < GRID_COLS; c++) {
+            const el = document.getElementById(`tile-${r}-${c}`);
+            if (el) el.addEventListener('click', () => handleTileClick(r, c));
+        }
+    }
 
-		// 1. 정답 경로를 무작위로 생성 (우물: 0,0 → 수도꼭지: 3,2)
-		// 시작(0,0)과 끝(3,2)은 반드시 세로(180도)로 연결되도록 경로를 만듭니다.
-		let path = [[0,0]];
-		let r = 0, c = 0;
-		// 첫 칸은 반드시 아래로 시작
-		r++;
-		path.push([r, c]);
-		// 중간 경로는 랜덤하게 오른쪽/아래로 이동
-		while (r < ROWS - 1 || c < COLS - 1) {
-			// 마지막 열에 도달하면 아래로만, 마지막 행에 도달하면 오른쪽으로만
-			if (r === ROWS - 1) {
-				c++;
-			} else if (c === COLS - 1) {
-				r++;
-			} else {
-				// 중간은 랜덤
-				if (Math.random() < 0.5) r++;
-				else c++;
-			}
-			path.push([r, c]);
-		}
-		// 마지막 칸은 반드시 위에서 내려오도록(세로 연결)
-		if (path[path.length-2][0] !== ROWS-1) {
-			// 마지막 바로 전 칸이 위가 아니면, 마지막 칸 바로 위로 이동
-			path.splice(path.length-1, 0, [ROWS-2, COLS-1]);
-		}
+    document.getElementById('tryAgainBtn')?.addEventListener('click', () => {
+        initializeLevel(currentLevel);
+        document.getElementById('loseOverlay').style.display = 'none';
+    });
 
-		// 2. 경로에 맞는 파이프와 방향을 미리 정해둡니다.
-		// 각 칸에 {type, rotation} 저장
-		const answerMap = {};
-		// --- 정답 경로 및 각 타일의 정답 정보 콘솔 출력 (테스트용) ---
-		console.log('정답 경로 (path):', JSON.stringify(path));
-		console.log('정답 타일별 type/rotation:');
-		for (let i = 0; i < path.length; i++) {
-			const [answerCr, answerCc] = path[i];
-			// 아래 줄에서 type/rotation은 answerMap에 저장하기 전이므로, 아래에서 저장 후 출력
-			const [cr, cc] = path[i];
-			let prev = path[i-1];
-			let next = path[i+1];
-			// 시작점(0,0): 반드시 아래로 연결
-			if (!prev) {
-				// 아래로 연결, pipe 또는 bend-pipe 중 랜덤
-				if (next[0] === cr+1 && next[1] === cc) {
-					// pipe(세로) 또는 bend-pipe(왼쪽 아래) 중 랜덤
-					if (Math.random() < 0.5) {
-						answerMap[`${cr},${cc}`] = {type: 'pipe', rotation: 90};
-					} else {
-						answerMap[`${cr},${cc}`] = {type: 'bend-pipe', rotation: 90};
-					}
-				}
-				// 정답 정보 출력
-				if (answerMap[`${answerCr},${answerCc}`]) {
-					const info = answerMap[`${answerCr},${answerCc}`];
-					console.log(`(${answerCr},${answerCc}): ${info.type} ${info.rotation}`);
-				}
-				continue;
-			}
-			// 끝점(3,2): 반드시 위에서 연결
-			if (!next) {
-				// 위에서 연결, pipe 또는 bend-pipe 중 랜덤
-				if (prev[0] === cr-1 && prev[1] === cc) {
-					if (Math.random() < 0.5) {
-						answerMap[`${cr},${cc}`] = {type: 'pipe', rotation: 90};
-					} else {
-						answerMap[`${cr},${cc}`] = {type: 'bend-pipe', rotation: 180};
-					}
-				}
-				if (answerMap[`${answerCr},${answerCc}`]) {
-					const info = answerMap[`${answerCr},${answerCc}`];
-					console.log(`(${answerCr},${answerCc}): ${info.type} ${info.rotation}`);
-				}
-				continue;
-			}
-			// 중간: 직선 or 꺾임
-			if ((prev[0] === cr && next[0] === cr) || (prev[1] === cc && next[1] === cc)) {
-				if (prev[0] === cr) {
-					answerMap[`${cr},${cc}`] = {type: 'pipe', rotation: 0}; // 가로
-				} else {
-					answerMap[`${cr},${cc}`] = {type: 'pipe', rotation: 90}; // 세로
-				}
-			} else {
-				// 꺾임: 방향에 따라 회전값 다름
-				if (prev[0] < cr && next[1] > cc || next[0] < cr && prev[1] > cc) {
-					answerMap[`${cr},${cc}`] = {type: 'bend-pipe', rotation: 0};
-				}
-				else if (prev[1] < cc && next[0] > cr || next[1] < cc && prev[0] > cr) {
-					answerMap[`${cr},${cc}`] = {type: 'bend-pipe', rotation: 90};
-				}
-				else if (prev[0] > cr && next[1] > cc || next[0] > cr && prev[1] > cc) {
-					answerMap[`${cr},${cc}`] = {type: 'bend-pipe', rotation: 270};
-				}
-				else {
-					answerMap[`${cr},${cc}`] = {type: 'bend-pipe', rotation: 180};
-				}
-			}
-			if (answerMap[`${answerCr},${answerCc}`]) {
-				const info = answerMap[`${answerCr},${answerCc}`];
-				console.log(`(${answerCr},${answerCc}): ${info.type} ${info.rotation}`);
-			}
-		}
+    document.getElementById('nextLevelBtn')?.addEventListener('click', () => {
+        document.getElementById('winOverlay').style.display = 'none';
+        if (currentLevel === 1) initializeLevel(2);
+        else if (currentLevel === 2) {
+            alert("Congratulations!! You've cleared all levels for now, I am working on more higher Levels!!");
+            // Attention, whenever Appdate the level, need to update this part too
+            stopPlaying();
+        }
+    });
 
-	// 3. 실제로 타일에 파이프 이미지를 배치합니다.
-	// 파이프 이미지 파일명: 'img/pipe.png'(직선), 'img/bend-pipe.png'(꺾임)
-	// 나머지 타일은 랜덤하게 채움 (t-pipe 제거)
-	const allTypes = ['pipe', 'bend-pipe'];
-	// moves 계산 및 각 타일별 클릭 횟수 콘솔 출력
-	let minMoves = 0;
-	let clickInfo = [];
-	for (let r = 0; r < ROWS; r++) {
-		for (let c = 0; c < COLS; c++) {
-			const tile = tiles[r][c];
-			if (!tile) continue;
-			tile.innerHTML = '';
-			let type, rotation, initialRot;
-			if (answerMap[`${r},${c}`]) {
-				// 정답 경로 타일: 정답 type/rotation으로 배치
-				type = answerMap[`${r},${c}`].type;
-				rotation = answerMap[`${r},${c}`].rotation;
-				initialRot = [0,90,180,270][Math.floor(Math.random()*4)]; // 무작위 시작 회전
-			} else {
-				// 나머지 타일: 랜덤 배치
-				type = allTypes[Math.floor(Math.random()*allTypes.length)];
-				rotation = [0,90,180,270][Math.floor(Math.random()*4)];
-				initialRot = rotation;
-			}
-			let imgSrc = type === 'pipe' ? 'img/pipe.png' : 'img/bend-pipe.png';
-			const img = document.createElement('img');
-			img.src = imgSrc;
-			img.alt = 'pipe';
-			img.className = 'pipe-img';
-			img.style.transform = `rotate(${initialRot}deg)`;
-			tile.appendChild(img);
-			tile.dataset.rotation = initialRot;
-			tile.style.transform = `rotate(${initialRot}deg)`;
-			tile.dataset.answerType = type;
-			tile.dataset.answerRotation = rotation;
-			// 정답 경로 타일이면 필요한 클릭 수 계산 및 출력용 배열 저장
-			if (answerMap[`${r},${c}`]) {
-				let diff = (rotation - initialRot + 360) % 360;
-				let clicks = diff / 90;
-				minMoves += clicks;
-				clickInfo.push(`(${r},${c}): ${clicks}회`);
-			}
-		}
-	}
-	console.log('각 정답 경로 타일별 클릭 횟수:', clickInfo.join(', '));
-	console.log('총 최소 클릭 수:', minMoves);
+    document.getElementById('stopBtn')?.addEventListener('click', stopPlaying);
 
-	// 승리 체크 함수
-	function checkWin() {
-		for (let r = 0; r < ROWS; r++) {
-			for (let c = 0; c < COLS; c++) {
-				const tile = tiles[r][c];
-				if (!tile) continue;
-				// 정답 경로 타일만 체크
-				if (answerMap[`${r},${c}`]) {
-					// 현재 파이프 종류와 회전이 정답과 일치해야 함
-					if (tile.dataset.answerType !== answerMap[`${r},${c}`].type) return false;
-					if (parseInt(tile.dataset.rotation, 10) !== answerMap[`${r},${c}`].rotation) return false;
-				}
-			}
-		}
-		return true;
-	}
-
-			// 승리 오버레이 표시 함수
-			function showWinOverlay() {
-				const winOverlay = document.getElementById('winOverlay');
-				if (winOverlay) winOverlay.style.display = 'flex';
-			}
-
-	// 4. 클릭 시 90도씩 회전 + 승리/패배 체크 + moves 감소
-	let moves = Math.round(minMoves);
-	const movesSpan = document.getElementById('moves');
-	if (movesSpan) movesSpan.textContent = moves;
-	let gameEnded = false;
-	// 게임 시작 시 이미 정답이면 바로 승리
-	if (checkWin()) {
-		gameEnded = true;
-		setTimeout(showWinOverlay, 200);
-	}
-	for (let r = 0; r < ROWS; r++) {
-		for (let c = 0; c < COLS; c++) {
-			const tile = tiles[r][c];
-			if (!tile) continue;
-			tile.addEventListener('click', () => {
-				if (gameEnded) return;
-				let rotation = parseInt(tile.dataset.rotation, 10);
-				rotation = (rotation + 90) % 360;
-				tile.dataset.rotation = rotation.toString();
-				tile.style.transform = `rotate(${rotation}deg)`;
-				// moves 감소
-				moves--;
-				if (movesSpan) movesSpan.textContent = moves;
-				// 승리 체크
-				if (checkWin()) {
-					gameEnded = true;
-					setTimeout(showWinOverlay, 200);
-					return;
-				}
-				// 패배 체크
-				if (moves <= 0) {
-					gameEnded = true;
-					setTimeout(() => {
-						const loseOverlay = document.getElementById('loseOverlay');
-						if (loseOverlay) loseOverlay.style.display = 'flex';
-					}, 200);
-				}
-			});
-		}
-	}
-
-				// Try Again 버튼 이벤트 연결
-				const tryAgainBtn = document.getElementById('tryAgainBtn');
-				if (tryAgainBtn) {
-					tryAgainBtn.addEventListener('click', function() {
-						window.location.reload();
-					});
-				}
-
-			// Next Level 버튼 클릭 시 새 퍼즐로 리셋 (간단하게 새로고침)
-			const nextBtn = document.getElementById('nextLevelBtn');
-			if (nextBtn) {
-				nextBtn.addEventListener('click', function() {
-					window.location.reload();
-				});
-			}
+    initializeLevel(1);
 });
