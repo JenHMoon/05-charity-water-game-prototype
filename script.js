@@ -254,9 +254,94 @@ function handleTileClick(r, c) {
 // =============================================================
 function showWinOverlay() {
     document.getElementById('winOverlay').style.display = 'flex';
+    // Play win sound for configured duration (defaults to 2s)
+    // play from 2s for 2 seconds (2..4s)
+    if (typeof playWinSound === 'function') playWinSound(2, 2);
 }
 function showLoseOverlay() {
     document.getElementById('loseOverlay').style.display = 'flex';
+}
+
+// Audio control: play the win sound for a limited number of seconds (1-5)
+let winAudioEl = null; // will be set after DOMContentLoaded
+let winAudioTimer = null;
+// default duration seconds
+let winSoundDuration = 2;
+
+function clampDuration(sec) {
+    const n = Number(sec) || 0;
+    return Math.min(5, Math.max(1, Math.floor(n)));
+}
+
+/**
+ * Play a segment of the win audio.
+ * @param {number} startSec start time in seconds (default 0)
+ * @param {number} durationSec how many seconds to play (1..5, default winSoundDuration)
+ */
+function playWinSound(startSec = 0, durationSec) {
+    if (!winAudioEl) return;
+    // verify there is a source and the browser can play it
+    const srcAttr = winAudioEl.getAttribute('src') || (winAudioEl.querySelector && (winAudioEl.querySelector('source')?.src));
+    if (!srcAttr) {
+        console.warn('winAudio: no src attribute or <source> found on audio element. Place water-drop.mp3 (or other supported file) in img/ and set the src.');
+        return;
+    }
+    // clamp start and duration values
+    const dur = durationSec ? clampDuration(durationSec) : clampDuration(winSoundDuration);
+    const start = Math.max(0, Number(startSec) || 0);
+
+    // reset any previous timer
+    if (winAudioTimer) {
+        clearTimeout(winAudioTimer);
+        winAudioTimer = null;
+    }
+
+    const doPlay = () => {
+        try {
+            // ensure start is within duration
+            const availDur = isFinite(winAudioEl.duration) ? winAudioEl.duration : Infinity;
+            const safeStart = Math.min(start, Math.max(0, availDur - 0.01));
+            winAudioEl.currentTime = safeStart;
+            const p = winAudioEl.play();
+            if (p && typeof p.then === 'function') {
+                p.then(() => console.log('winAudio: play() resolved at', safeStart))
+                 .catch(err => console.warn('winAudio: play() rejected:', err));
+            } else {
+                console.log('winAudio: play() returned non-promise or immediate');
+            }
+        } catch (e) {
+            console.warn('winAudio: play() threw', e);
+        }
+        // stop after dur seconds
+        winAudioTimer = setTimeout(() => {
+            stopPlaying();
+        }, dur * 1000);
+    };
+
+    // if metadata not loaded yet, wait then play
+    if (!isFinite(winAudioEl.duration) || winAudioEl.readyState < 1) {
+        const onReady = () => {
+            winAudioEl.removeEventListener('loadedmetadata', onReady);
+            doPlay();
+        };
+        winAudioEl.addEventListener('loadedmetadata', onReady);
+        // attempt to load
+        try { winAudioEl.load(); } catch (e) {}
+    } else {
+        doPlay();
+    }
+}
+
+function stopPlaying() {
+    if (!winAudioEl) return;
+    try {
+        winAudioEl.pause();
+        winAudioEl.currentTime = 0;
+    } catch (e) {}
+    if (winAudioTimer) {
+        clearTimeout(winAudioTimer);
+        winAudioTimer = null;
+    }
 }
 
 // =============================================================
@@ -332,6 +417,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         closeHintBtn.addEventListener('click', function() {
             hintOverlay.style.display = 'none';
+        });
+    }
+
+    // get audio element reference after DOM is ready
+    winAudioEl = document.getElementById('winAudio');
+    if (winAudioEl) {
+        // Try to 'unlock' audio on the first user click so browsers allow future play()
+        const unlockAudio = () => {
+            try {
+                // Temporarily mute so the unlock play is silent
+                const wasMuted = winAudioEl.muted;
+                winAudioEl.muted = true;
+                const p = winAudioEl.play();
+                if (p && typeof p.then === 'function') {
+                    p.then(() => {
+                        // immediately pause and reset so we don't actually hear it now
+                        try { winAudioEl.pause(); } catch (e) {}
+                        try { winAudioEl.currentTime = 0; } catch (e) {}
+                        winAudioEl.muted = wasMuted;
+                    }).catch(() => {
+                        winAudioEl.muted = wasMuted;
+                    });
+                } else {
+                    try { winAudioEl.pause(); } catch (e) {}
+                    try { winAudioEl.currentTime = 0; } catch (e) {}
+                    winAudioEl.muted = wasMuted;
+                }
+            } catch (e) {
+                try { winAudioEl.muted = false; } catch (ee) {}
+            }
+        };
+        document.addEventListener('click', unlockAudio, { once: true });
+
+        // If user clicks the win overlay backdrop, hide it and stop audio
+        const winOverlayEl = document.getElementById('winOverlay');
+        if (winOverlayEl) {
+            winOverlayEl.addEventListener('click', (e) => {
+                if (e.target === winOverlayEl) {
+                    winOverlayEl.style.display = 'none';
+                    stopPlaying();
+                }
+            });
+        }
+    }
+    // debug: play audio test button
+    const playAudioTestBtn = document.getElementById('playAudioTest');
+    if (playAudioTestBtn) {
+        playAudioTestBtn.addEventListener('click', () => {
+            console.log('Debug: playAudioTest clicked');
+            // this click should also satisfy browsers' user gesture requirement
+            playWinSound();
         });
     }
 });
