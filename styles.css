@@ -1,3 +1,18 @@
+/* Charity: water Brand Colors
+
+Primary Colors:
+- Yellow:     #FFC907;
+- Blue:       #2E9DF7;
+
+Secondary Colors:
+- Light Blue: #8BD1CB;
+- Green:      #4FCB53;
+- Orange:     #FF902A;
+- Red:        #F5402C;
+- Dark Green: #159A48;
+- Pink:       #F16061;
+*/
+
 /* 승리 메시지 오버레이 및 모달 스타일 */
 .win-overlay {
 	position: fixed;
@@ -27,6 +42,39 @@
 	font-weight: bold;
 	color: #52A7C1;
 	margin-bottom: 10px;
+}
+.win-image {
+	width: 120px;
+	height: auto;
+	object-fit: contain;
+	display: block;
+	margin: 0 auto;
+}
+
+/* Donation image in hint overlay (separate from win-image) */
+.donation-image {
+	width: 260px;
+  height: 240px;
+	max-width: 100%;
+	display: block;
+}
+
+@media (max-width: 600px) {
+	.donation-image { width: 140px; }
+}
+
+/* Instruction text shown under donation image in hint overlay */
+.hint-instruction {
+	font-size: 0.95em;
+	color: #2E3A59;
+	opacity: 0.95;
+	margin-top: 8px;
+	margin-bottom: 6px;
+	text-align: center;
+}
+
+@media (max-width: 600px) {
+	.hint-instruction { font-size: 0.9em; }
 }
 .next-btn {
 	width: 160px;
@@ -111,17 +159,6 @@
 	background: none;
 	color: #3F3C3C;
 }
-.instruction-container {
-	margin-top: 0px;
-	font-size: 1.1em;
-	color: #3F3C3C;
-	background: none;
-	border: none;
-	padding: 0;
-	box-shadow: none;
-	font-weight: 500;
-	letter-spacing: 0.01em;
-}
 .game-bg {
 	display: flex;
 	justify-content: center;
@@ -130,7 +167,7 @@
 	background-repeat: repeat;
 	background-size: 100px 100px;
 	border-radius: 24px;
-	padding: 0px 56px 40px 56px;
+	padding: 0px 56px 20px 56px; /* reduced bottom padding */
 	margin-top: 4px;
 	width: 100%;
 	max-width: 800px;
@@ -298,22 +335,15 @@
 	font-size: 1.3em;
 	font-weight: 500;
 }
-.level-info, .moves-info {
+.moves-info {
 	border-radius: 8px;
 	padding: 8px 20px;
 	box-shadow: 0 1px 4px rgba(46,157,247,0.06);
 	margin: 0;
 	min-width: 90px;
 	text-align: center;
-}
-.level-info {
-	background: #77ABBB;
-	color: #fff;
-	font-weight: 600;
-}
-.moves-info {
 	background: #fff;
-	border: 2px solid #003366;
+	border: 2px solid #52A7C1;
 	color: #3F3C3C;
 	font-weight: 600;
 }
@@ -338,24 +368,10 @@
 	color: #FFC907;
 	margin-top: 2px;
 }
-/* Charity: water Brand Colors
-
-Primary Colors:
-- Yellow:     #FFC907;
-- Blue:       #2E9DF7;
-
-Secondary Colors:
-- Light Blue: #8BD1CB;
-- Green:      #4FCB53;
-- Orange:     #FF902A;
-- Red:        #F5402C;
-- Dark Green: #159A48;
-- Pink:       #F16061;
-*/
 
 body {
 	background: #f7fafc;
-	font-family: 'Segoe UI', Arial, sans-serif;
+	font-family: 'Proxima Nova', 'Segoe UI', Arial, sans-serif;
 	margin: 0;
 	padding: 0;
 	text-align: center;
@@ -365,7 +381,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	margin-top: 32px;
+	margin-top: 16px; /* reduced spacing above game area */
 }
 
 .well-row, .tap-row {
@@ -425,4 +441,63 @@ body {
 }
 .tile:active {
 	background: rgba(82, 167, 193, 0.85);
+}
+
+
+/* Kento added for version 2*/
+.difficulty-container {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.difficulty-btn {
+	padding: 8px 20px;
+	font-size: 1em;
+	font-weight: 600;
+	border-radius: 8px;
+	border: 2px solid #52A7C1;
+	cursor: pointer;
+	background: #e6f7ff; /* match popup/next btn base */
+	color: #2E3A59; /* match popup/next btn text color */
+	transition: background 0.18s, border 0.18s;
+	box-shadow: 0 1px 4px rgba(46,157,247,0.08);
+}
+.difficulty-btn:hover {
+	background: #52A7C1;
+	color: #fff;
+	border-color: #2E9DF7;
+}
+.difficulty-btn.active {
+	background: white;
+	color: #3F3C3C;
+	border-color: #52A7C1;
+}
+
+/* Footer: charity:water branding */
+.site-footer {
+	margin-top: 0; /* remove extra space so footer sits right below game area */
+	padding: 8px 0 24px 0; /* small top padding to separate from game container */
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.charity-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	text-decoration: none;
+	color: inherit;
+}
+/* Footer image replacement */
+.footer-img {
+    max-width: 220px;
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+@media (max-width: 600px) {
+    .footer-img { max-width: 160px; }
 }

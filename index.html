@@ -1,37 +1,45 @@
 <!DOCTYPE html>
 <html lang="en">
+<!--Version 2-->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Charity Water Game</title>
+    <link rel="stylesheet" href="https://use.typekit.net/gwn8ryr.css">
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <!-- 상단 좌측: 뒤로가기 버튼, 헤더+힌트 한 줄 -->
     <div class="popup-overlay" id="popupOverlay" style="display:none;">
         <div class="popup-modal">
-            <button class="popup-btn" id="homeBtn">Home</button>
             <button class="popup-btn" id="resumeBtn">Resume</button>
         </div>
     </div>
     <!-- 힌트 메시지 오버레이 -->
     <div class="win-overlay" id="hintOverlay" style="display:none;">
         <div class="win-modal">
-            <div class="win-message">Hint</div>
+            <div class="win-message"> Earn 10 more moves after donation!</div>
+            <a href="https://www.charitywater.org/donate/the-spring" target="_blank" rel="noopener noreferrer">
+                <img src="img/donation.png" alt="Donate" class="donation-image" />
+            </a>
+            <div class="hint-instruction">Click the image to donate</div>
             <button class="next-btn" id="closeHintBtn">Close</button>
         </div>
     </div>
     <!-- 승리 메시지 오버레이 -->
     <div class="win-overlay" id="winOverlay" style="display:none;">
         <div class="win-modal">
-            <div class="win-message">Congrats!</div>
+            <div class="win-message">Congrats!<br>You earned a water can!</div>
+            <img src="img/water-can-transparent.png" alt="Water Can" class="win-image" />
             <button class="next-btn" id="nextLevelBtn">Next Level</button>
         </div>
     </div>
     <!-- 패배 메시지 오버레이 -->
     <div class="win-overlay" id="loseOverlay" style="display:none;">
         <div class="win-modal">
-            <div class="win-message" style="color:#e74c3c">Out of Moves</div>
+            <div class="win-message" style="color:#F5402C">Out of Moves<br>You lost a water can</div>
+            <img src="img/lose.png" alt="Losing" class="win-image" />  
             <button class="next-btn" id="tryAgainBtn">Try Again</button>
         </div>
     </div>
@@ -47,59 +55,69 @@
             </div>
         </div>
         <div class="info-container">
-            <div class="level-info">Level: <span id="level">1</span></div>
-            <div class="moves-info">Moves: <span id="maxMoves">10</span></div>
+            <div class="difficulty-container">
+                <button class="difficulty-btn active" id="easyBtn">Easy</button>
+                <button class="difficulty-btn" id="normalBtn">Normal</button>
+                <button class="difficulty-btn" id="hardBtn">Hard</button>
+            </div>
+            <div class="moves-info">Moves: <span id="moves">0</span></div>
         </div>
     </div>
-    <div class="instruction-container">Click to connect the pipeline</div>
-        <!-- 게임 영역 배경 -->
-        <div class="game-bg">
-            <div class="game-container">
-                <!-- 3x4 그리드 (well/tap 이미지를 타일 위/아래에 배치) -->
-                <div class="grid">
-            <!-- well이 첫 번째 타일 위에 위치 -->
-            <div class="tile-row">
-                <div class="tile-well-container">
-                    <img src="img/well.png" alt="well" class="well-img" />
+    <!-- 게임 영역 배경 -->
+    <div class="game-bg">
+        <div class="game-container">
+            <!-- 3x4 그리드 (well/tap 이미지를 타일 위/아래에 배치) -->
+            <div class="grid">
+                <!-- well이 첫 번째 타일 위에 위치 -->
+                <div class="tile-row">
+                    <div class="tile-well-container">
+                        <img src="img/well.png" alt="well" class="well-img" />
+                    </div>
+                    <div class="tile-empty"></div>
+                    <div class="tile-empty"></div>
                 </div>
-                <div class="tile-empty"></div>
-                <div class="tile-empty"></div>
-            </div>
-            <!-- 1행 -->
-            <div class="tile-row">
-                <div class="tile" id="tile-0-0"></div>
-                <div class="tile" id="tile-0-1"></div>
-                <div class="tile" id="tile-0-2"></div>
-            </div>
-            <!-- 2행 -->
-            <div class="tile-row">
-                <div class="tile" id="tile-1-0"></div>
-                <div class="tile" id="tile-1-1"></div>
-                <div class="tile" id="tile-1-2"></div>
-            </div>
-            <!-- 3행 -->
-            <div class="tile-row">
-                <div class="tile" id="tile-2-0"></div>
-                <div class="tile" id="tile-2-1"></div>
-                <div class="tile" id="tile-2-2"></div>
-            </div>
-            <!-- 4행 -->
-            <div class="tile-row">
-                <div class="tile" id="tile-3-0"></div>
-                <div class="tile" id="tile-3-1"></div>
-                <div class="tile" id="tile-3-2"></div>
-            </div>
-            <!-- tap이 마지막 타일 아래에 위치 -->
-            <div class="tile-row">
-                <div class="tile-empty"></div>
-                <div class="tile-empty"></div>
-                <div class="tile-tap-container">
-                    <img src="img/tap.png" alt="tap" class="tap-img" />
+                <!-- 1행 -->
+                <div class="tile-row">
+                    <div class="tile" id="tile-0-0"></div>
+                    <div class="tile" id="tile-0-1"></div>
+                    <div class="tile" id="tile-0-2"></div>
+                </div>
+                <!-- 2행 -->
+                <div class="tile-row">
+                    <div class="tile" id="tile-1-0"></div>
+                    <div class="tile" id="tile-1-1"></div>
+                    <div class="tile" id="tile-1-2"></div>
+                </div>
+                <!-- 3행 -->
+                <div class="tile-row">
+                    <div class="tile" id="tile-2-0"></div>
+                    <div class="tile" id="tile-2-1"></div>
+                    <div class="tile" id="tile-2-2"></div>
+                </div>
+                <!-- 4행 -->
+                <div class="tile-row">
+                    <div class="tile" id="tile-3-0"></div>
+                    <div class="tile" id="tile-3-1"></div>
+                    <div class="tile" id="tile-3-2"></div>
+                </div>
+                <!-- tap이 마지막 타일 아래에 위치 -->
+                <div class="tile-row">
+                    <div class="tile-empty"></div>
+                    <div class="tile-empty"></div>
+                    <div class="tile-tap-container">
+                        <img src="img/tap.png" alt="tap" class="tap-img" />
+                    </div>
                 </div>
             </div>
         </div>
-      </div>
     </div>
     <script src="script.js"></script>
+    <!-- Footer with charity:water logo -->
+    <footer class="site-footer">
+        <a href="https://www.charitywater.org/donate/the-spring" class="charity-link" id="charityLink" target="_blank" rel="noopener noreferrer">
+            <img src="img/footer.png" alt="charity:water" class="footer-img" />
+        </a>
+    </footer>
 </body>
+
 </html>
